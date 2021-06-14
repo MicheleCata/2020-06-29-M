@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import it.polito.tdp.imdb.model.Actor;
 import it.polito.tdp.imdb.model.Director;
 import it.polito.tdp.imdb.model.Movie;
@@ -61,9 +63,8 @@ public class ImdbDAO {
 	}
 	
 	
-	public List<Director> listAllDirectors(){
+	public void listAllDirectors(Map<Integer, Director> idMap){
 		String sql = "SELECT * FROM directors";
-		List<Director> result = new ArrayList<Director>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
@@ -73,20 +74,36 @@ public class ImdbDAO {
 
 				Director director = new Director(res.getInt("id"), res.getString("first_name"), res.getString("last_name"));
 				
-				result.add(director);
+				idMap.put(director.getId(), director);
 			}
 			conn.close();
-			return result;
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return null;
+			
 		}
 	}
 	
-	
-	
-	
-	
+	public List<Director> getVertici (int anno, Map<Integer, Director> idMap){
+		String sql = "SELECT DISTINCT md.`director_id` as id "
+				+ "From movies m, movies_directors md "
+				+ "where m.`id`=md.`movie_id` and m.`year`=?";
+		
+		List<Director> result = new ArrayList<>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, anno);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				result.add(idMap.get(res.getInt("id")));
+			}
+				conn.close();
+				return result;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return null;
+			}
+	}
 	
 }
