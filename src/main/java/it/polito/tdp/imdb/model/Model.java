@@ -1,6 +1,9 @@
 package it.polito.tdp.imdb.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jgrapht.Graphs;
@@ -25,5 +28,25 @@ public class Model {
 		grafo = new SimpleWeightedGraph<Director, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 		
 		Graphs.addAllVertices(grafo, dao.getVertici(anno, idMap));
+		
+		for (Adiacenze a: dao.getAdiacenze(anno, idMap)) {
+			Graphs.addEdgeWithVertices(grafo, a.getD1(), a.getD2(),a.getPeso());
+		}
+		System.out.format("Grafo creato con %d vertici e %d archi\n",
+ 				this.grafo.vertexSet().size(), this.grafo.edgeSet().size()); 
+	}
+	
+	public int getNumVertici() {
+		return this.grafo.vertexSet().size();
+	}
+	
+	public int getNArchi() {
+		return this.grafo.edgeSet().size();
+	}
+	
+	public List<Director> getRegisti(){
+		List<Director> registi = new ArrayList<>(grafo.vertexSet());
+		
+		return registi;
 	}
 }

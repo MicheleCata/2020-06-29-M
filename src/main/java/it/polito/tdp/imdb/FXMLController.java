@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.imdb.model.Director;
 import it.polito.tdp.imdb.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,7 +41,7 @@ public class FXMLController {
     private ComboBox<Integer> boxAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxRegista"
-    private ComboBox<?> boxRegista; // Value injected by FXMLLoader
+    private ComboBox<Director> boxRegista; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtAttoriCondivisi"
     private TextField txtAttoriCondivisi; // Value injected by FXMLLoader
@@ -50,7 +51,20 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	
+    	txtResult.clear();
+    	Integer anno = boxAnno.getValue();
+    	
+    	if (anno==null) {
+    		txtResult.appendText("Seleziona i valori di input!");
+    		return;
+    	}
+    	
+    	this.model.creaGrafo(anno);
+    	txtResult.appendText("Grafo creato\n #VERTICI: "+ model.getNumVertici()+ " \n #ARCHI: "+ model.getNArchi()+"\n");
+    
+    	boxRegista.getItems().addAll(model.getRegisti());
+    
     }
 
     @FXML

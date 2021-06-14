@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import it.polito.tdp.imdb.model.Actor;
+import it.polito.tdp.imdb.model.Adiacenze;
 import it.polito.tdp.imdb.model.Director;
 import it.polito.tdp.imdb.model.Movie;
 
@@ -104,6 +105,35 @@ public class ImdbDAO {
 				e.printStackTrace();
 				return null;
 			}
+	}
+	
+	public List<Adiacenze> getAdiacenze(int anno, Map<Integer, Director> idMap) {
+		String sql = "SELECT md1.`director_id` as d1, md2.`director_id` as d2, COUNT(*) as peso "
+				+ "FROM movies_directors md1, movies_directors md2, movies m1, movies m2, roles r1, roles r2 "
+				+ "where md1.`movie_id`=m1.`id` AND md2.`movie_id`=m2.id AND r1.`movie_id`=md1.`movie_id` AND r2.`movie_id`=md2.`movie_id`AND r1.`actor_id`=r2.`actor_id` AND md1.`director_id`>md2.`director_id` and m1.`year`=? and m1.`year`=m2.`year` "
+				+ "group by md1.`director_id`, md2.`director_id`";
+		
+		List<Adiacenze> result = new ArrayList<>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, anno);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				Director d1= idMap.get(res.getInt("d1"));
+				Director d2= idMap.get(res.getInt("d2"));
+				if (d1!=null && d2!=null)
+					result.add(new Adiacenze(d1,d2,res.getInt("peso")));
+			
+			}
+			conn.close();
+			return result;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+			
 	}
 	
 }
