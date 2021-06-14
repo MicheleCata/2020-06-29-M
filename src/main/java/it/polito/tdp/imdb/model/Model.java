@@ -18,6 +18,9 @@ public class Model {
 	private ImdbDAO dao;
 	private Map<Integer, Director> idMap;
 	
+	private List<Director> percorsoMigliore;
+	private int sum=0;
+	
 	public Model() {
 		dao = new ImdbDAO();
 		idMap = new HashMap<Integer,Director>();
@@ -48,5 +51,54 @@ public class Model {
 		List<Director> registi = new ArrayList<>(grafo.vertexSet());
 		
 		return registi;
+	}
+	
+	public List<ArcoPeso> getVicini(Director d) {
+		List<ArcoPeso> result = new ArrayList<>();
+		for (Director d1: Graphs.neighborListOf(grafo, d)) {
+			DefaultWeightedEdge e = grafo.getEdge(d, d1);
+			result.add(new ArcoPeso(d1,(int) grafo.getEdgeWeight(e)));
+		}
+		Collections.sort(result);
+		return result;
+	}
+	
+	
+	public List<Director> getPercorso(Director partenza, Integer c){
+		
+		this.percorsoMigliore=new ArrayList<>();
+		List<Director> parziale = new ArrayList<>();
+		parziale.add(partenza);
+		cerca(c,parziale);
+		
+		return percorsoMigliore;
+		
+	}
+
+	private void cerca(Integer c, List<Director> parziale) {
+		
+		// CASO TERMINALE
+		if (sum>c) {
+			return;
+		}
+		else if(parziale.size()>this.percorsoMigliore.size()) {
+				this.percorsoMigliore= new ArrayList<>(parziale);
+				return;
+			}
+		
+		List<ArcoPeso> vicini = this.getVicini(parziale.get(parziale.size()-1));
+		for (ArcoPeso p: vicini) {
+			if(!parziale.contains(p.getD())) {
+				sum= sum+ p.getPeso();
+				if(sum<=c) {
+					parziale.add(p.getD());
+					cerca(c,parziale);
+					parziale.remove(parziale.size()-1);
+				}
+			}
+			
+		}
+		
+		
 	}
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.imdb.model.ArcoPeso;
 import it.polito.tdp.imdb.model.Director;
 import it.polito.tdp.imdb.model.Model;
 import javafx.event.ActionEvent;
@@ -69,11 +70,48 @@ public class FXMLController {
 
     @FXML
     void doRegistiAdiacenti(ActionEvent event) {
-
+    	txtResult.clear();
+    	Director d= boxRegista.getValue();
+    	
+    	if (d==null) {
+    		txtResult.appendText("ERRORE: scegli un regista!\n");
+    	}
+    	
+    	List<ArcoPeso> result = model.getVicini(d);
+    	
+    	txtResult.appendText("Registi adiacenti a "+ d.toString()+"\n");
+    	if(result.size()==0) {
+    		txtResult.appendText("NESSUNO\n");
+    	}else {
+    		
+    		for (ArcoPeso d1: result) {
+    			txtResult.appendText(d1.toString()+"\n");
+    		}
+    	}
     }
 
     @FXML
     void doRicorsione(ActionEvent event) {
+    	txtResult.clear();
+    	Director partenza = boxRegista.getValue();
+    	if (partenza==null) {
+    		txtResult.appendText("ERRORE: scegli un regista!\n");
+    	}
+    	String soglia = txtAttoriCondivisi.getText();
+    	
+    	int c;
+    	try {
+    		c= Integer.parseInt(soglia);
+    		
+    	}catch (NumberFormatException e) {
+    		txtResult.setText("Inserisci un valore numerico");
+    		return;
+    	}
+    	
+    	List<Director> percorso = model.getPercorso(partenza, c);
+    	for (Director d: percorso) {
+    		txtResult.appendText(d+"\n");
+    	}
 
     }
 

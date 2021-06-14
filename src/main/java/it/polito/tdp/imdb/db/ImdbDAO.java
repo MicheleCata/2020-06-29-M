@@ -87,7 +87,8 @@ public class ImdbDAO {
 	public List<Director> getVertici (int anno, Map<Integer, Director> idMap){
 		String sql = "SELECT DISTINCT md.`director_id` as id "
 				+ "From movies m, movies_directors md "
-				+ "where m.`id`=md.`movie_id` and m.`year`=?";
+				+ "where m.`id`=md.`movie_id` and m.`year`=? "
+				+ "order by id ASC";
 		
 		List<Director> result = new ArrayList<>();
 		Connection conn = DBConnect.getConnection();
